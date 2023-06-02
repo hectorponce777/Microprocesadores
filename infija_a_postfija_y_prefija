@@ -1,0 +1,79 @@
+#include <iostream>
+#include <stack> // se debe de utilizar una pila y por eso necesitamos llamar las librerias de pila.
+#include <string>
+using namespace std;
+
+//funcion de precedencia, esta funcion devolverá valores para el orden de las operaciones
+int precedencia(char op) {
+    if (op == '+' || op == '-') //mayor precedencia (tiene prioridad al ejecutarse básico de matemáticas)
+        return 1;
+    if (op == '*' || op == '/') //mayor precedencia (tiene prioridad al ejecutarse básico de matemáticas)
+        return 2;
+    return 0;
+}
+
+//funcion para convertir infija a postfija, recibe el valor infija que se obtiene al principio, cuando se captura la infija
+string infija_a_postfija(string infija) {
+    string postfija;
+    stack<char> s;
+
+    for (char ch : infija) {
+        if (isalnum(ch)) {
+            postfija += ch;
+        } else if (ch == '(') {
+            s.push(ch);
+        } else if (ch == ')') {
+            while (!s.empty() && s.top() != '(') {
+                postfija += s.top();
+                s.pop();
+            }
+            s.pop();
+        } else {
+            while (!s.empty() && precedencia(ch) <= precedencia(s.top())) {
+                postfija += s.top();
+                s.pop();
+            }
+            s.push(ch);
+        }
+    }
+
+    while (!s.empty()) {
+        postfija += s.top();
+        s.pop();
+    }
+
+    return postfija;
+}
+
+//funcion para convertir infija a prefija, recibe el valor infija que se obtiene al principio, cuando se captura la infija
+string infija_a_prefija(string infija) {
+    reverse(infija.begin(), infija.end());
+
+    for (int i = 0; i < infija.length(); i++) {
+        if (infija[i] == '(')
+            infija[i] = ')';
+        else if (infija[i] == ')')
+            infija[i] = '(';
+    }
+
+    string prefija = infija_a_postfija(infija);
+
+    reverse(prefija.begin(), prefija.end());
+
+    return prefija;
+}
+
+//Cuerpo principal del programa, se ingresa la notación INFIJA, posteriormente se manda llamar las diferentes funciones y se les envía el valor infija para convertirlo
+int main() {
+    string infija;
+    cout << "Ingrese la notación infija: ";
+    cin >> infija;
+
+    string postfija = infija_a_postfija(infija);
+    cout << "Notación postfija: " << postfija << endl;
+
+    string prefija = infija_a_prefija(infija);
+    cout << "Notación prefija: " << prefija << endl;
+
+    return 0;
+}
